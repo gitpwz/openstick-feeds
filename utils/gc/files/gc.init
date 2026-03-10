@@ -18,6 +18,7 @@ start_service() {
  	serial=$(uci get gc.config.serial 2>/dev/null)
  	hid=$(uci get gc.config.hid 2>/dev/null)
  	ecm=$(uci get gc.config.ecm 2>/dev/null)
+ 	ncm=$(uci get gc.config.ncm 2>/dev/null)
  	acm=$(uci get gc.config.acm 2>/dev/null)
  	printer=$(uci get gc.config.printer 2>/dev/null)
  	midi=$(uci get gc.config.midi 2>/dev/null)
@@ -28,6 +29,9 @@ start_service() {
 		gc -c
 		if [ $ecm -eq 1 ]; then
 			gc -a ecm
+		fi
+		if [ $ncm -eq 1 ]; then
+			gc -a ncm
 		fi
 		if [ $rndis -eq 1 ]; then
 			gc -a rndis
@@ -70,6 +74,7 @@ stop_service() {
     if [ $adb -eq 1 ]; then
 		/etc/init.d/adbd stop
 	fi
+	gc -d
 	gc -c
 }
 
