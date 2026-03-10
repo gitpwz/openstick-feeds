@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gc
-PKG_VERSION:=20220516
-PKG_RELEASE:=2
+PKG_VERSION:=20260310
+PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/HandsomeMod/gc.git
+PKG_SOURCE_URL:=https://github.com/lkiuyu/gc.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_VERSION:=de35c978e08cf60899337d82c14a88f5fdd64016
-PKG_MIRROR_HASH:=12aa9ee2f1d03cfb11cb294cfcd374ba910367a249c853c91087ebefb14f8f72
+PKG_SOURCE_VERSION:=1e2b4d9480cf75663212a2bb7c550f3aae07ef50
+PKG_MIRROR_HASH:=58f8ad3f91e8488acc6f034ba0da1efb13a39cfe94f397047a72be827c076bc3
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
@@ -28,7 +28,15 @@ define Package/gc
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:= Usb Gadget Manager
-  DEPENDS:= +libusbgx +android-tools-adbd
+  DEPENDS:=@USB_GADGET_SUPPORT +kmod-fs-configfs +kmod-usb-gadget +kmod-usb-lib-composite +kmod-usb-gadget-serial +kmod-usb-gadget-mass-storage +kmod-usb-gadget-ncm +libusbgx +android-tools-adbd
+endef
+
+define Package/luci-app-gc
+  SECTION:=luci
+  CATEGORY:=LuCI
+  SUBMENU:=3. Applications
+  TITLE:=LuCI support for gc USB Gadget Manager
+  DEPENDS:= +gc +luci-base
 endef
 
 define Package/gc/install
@@ -51,4 +59,16 @@ define Package/gc/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/gc $(1)/usr/bin/
 endef
 
+define Package/luci-app-gc/install
+	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
+	$(INSTALL_DATA) ./luci-app-gc/root/usr/share/luci/menu.d/luci-app-gc.json $(1)/usr/share/luci/menu.d/luci-app-gc.json
+
+	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+	$(INSTALL_DATA) ./luci-app-gc/root/usr/share/rpcd/acl.d/luci-app-gc.json $(1)/usr/share/rpcd/acl.d/luci-app-gc.json
+
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/gc
+	$(INSTALL_DATA) ./luci-app-gc/htdocs/luci-static/resources/view/gc/config.js $(1)/www/luci-static/resources/view/gc/config.js
+endef
+
 $(eval $(call BuildPackage,gc))
+$(eval $(call BuildPackage,luci-app-gc))
